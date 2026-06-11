@@ -1,0 +1,17 @@
+
+
+services:
+
+  backend:
+    build: ./microservices/auth-service
+    container_name: pulseops-backend
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend/dashboard-ui
+    container_name: pulseops-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
