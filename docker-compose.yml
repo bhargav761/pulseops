@@ -1,7 +1,4 @@
-
-
 services:
-
   backend:
     build: ./microservices/auth-service
     container_name: pulseops-backend
@@ -15,3 +12,37 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+
+  prometheus:
+    image: prom/prometheus
+    container_name: pulseops-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana
+    container_name: pulseops-grafana
+    ports:
+      - "3000:3000"
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: pulseops-node-exporter
+    ports:
+      - "9100:9100"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: pulseops-cadvisor
+    ports:
+      - "8080:8080"
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
