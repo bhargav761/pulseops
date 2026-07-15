@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: pulseops-frontend
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: pulseops-frontend
+
+  template:
+    metadata:
+      labels:
+        app: pulseops-frontend
+
+    spec:
+      containers:
+        - name: frontend
+
+          image: pulseops-frontend:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 5173
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
