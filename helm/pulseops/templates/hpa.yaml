@@ -1,32 +1,38 @@
-{{- if .Values.autoscaling.enabled }}
+{{- if .Values.hpa.enabled }}
+
 apiVersion: autoscaling/v2
+
 kind: HorizontalPodAutoscaler
+
 metadata:
-  name: {{ include "pulseops.fullname" . }}
-  labels:
-    {{- include "pulseops.labels" . | nindent 4 }}
+  name: pulseops-backend-hpa
+
 spec:
+
   scaleTargetRef:
+
     apiVersion: apps/v1
+
     kind: Deployment
-    name: {{ include "pulseops.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+
+    name: pulseops-backend
+
+  minReplicas: 2
+
+  maxReplicas: 5
+
   metrics:
-    {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+
     - type: Resource
+
       resource:
+
         name: cpu
+
         target:
+
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
-    {{- end }}
-    {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
-    {{- end }}
+
+          averageUtilization: 70
+
 {{- end }}
