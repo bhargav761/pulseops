@@ -10,15 +10,18 @@ on:
       - main
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
 
+      # Checkout Repository
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      # -------------------------------
+      # Backend
+      # -------------------------------
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,12 +31,17 @@ jobs:
       - name: Install Backend Dependencies
         working-directory: microservices/auth-service
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check Backend
+      - name: Verify Backend Syntax
         working-directory: microservices/auth-service
         run: |
           python -m py_compile main.py
+
+      # -------------------------------
+      # Frontend
+      # -------------------------------
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -41,22 +49,34 @@ jobs:
           node-version: "20"
 
       - name: Install Frontend Dependencies
-        working-directory: frontend
+        working-directory: frontend/dashboard-ui
         run: |
           npm install
 
       - name: Build Frontend
-        working-directory: frontend
+        working-directory: frontend/dashboard-ui
         run: |
           npm run build
 
+      # -------------------------------
+      # Docker Images
+      # -------------------------------
+
       - name: Build Backend Docker Image
         run: |
-          docker build -t pulseops-backend:v2 ./microservices/auth-service
+          docker build \
+            -t pulseops-backend:latest \
+            ./microservices/auth-service
 
       - name: Build Frontend Docker Image
         run: |
-          docker build -t pulseops-frontend:latest ./frontend
+          docker build \
+            -t pulseops-frontend:latest \
+            ./frontend/dashboard-ui
+
+      # -------------------------------
+      # Success
+      # -------------------------------
 
       - name: CI Completed
-        run: echo "✅ PulseOps CI Passed"
+        run: echo "🎉 PulseOps CI completed successfully!"
