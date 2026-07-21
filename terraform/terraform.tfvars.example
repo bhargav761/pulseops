@@ -1,0 +1,7 @@
+project_name = "pulseops"
+
+environment = "dev"
+
+owner = "Bhargava"
+
+aws_region = "ap-south-1"
