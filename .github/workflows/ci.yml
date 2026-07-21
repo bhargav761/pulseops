@@ -77,6 +77,25 @@ jobs:
       # -------------------------------
       # Success
       # -------------------------------
-
+        
       - name: CI Completed
         run: echo "🎉 PulseOps CI completed successfully!"
+
+              # -------------------------------
+      # Install Helm
+      # -------------------------------
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.15.4
+
+      # -------------------------------
+      # Helm Validation
+      # -------------------------------
+      - name: Helm Lint
+        working-directory: helm/pulseops
+        run: helm lint .
+
+      - name: Helm Template Validation
+        working-directory: helm/pulseops
+        run: helm template pulseops .
