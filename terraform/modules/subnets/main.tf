@@ -10,7 +10,6 @@ resource "aws_subnet" "public_1" {
 
     "kubernetes.io/role/elb" = "1"
   })
-
 }
 
 resource "aws_subnet" "public_2" {
@@ -25,7 +24,6 @@ resource "aws_subnet" "public_2" {
 
     "kubernetes.io/role/elb" = "1"
   })
-
 }
 
 resource "aws_subnet" "private_1" {
@@ -39,7 +37,6 @@ resource "aws_subnet" "private_1" {
 
     "kubernetes.io/role/internal-elb" = "1"
   })
-
 }
 
 resource "aws_subnet" "private_2" {
@@ -53,5 +50,4 @@ resource "aws_subnet" "private_2" {
 
     "kubernetes.io/role/internal-elb" = "1"
   })
-
 }

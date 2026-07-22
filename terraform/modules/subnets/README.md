@@ -7,7 +7,7 @@
 
 ## Features
 
-- Multi Availability Zone
+- Multi-AZ
 - EKS Ready
-- ELB Tags
+- Public ELB Tags
 - Internal ELB Tags
