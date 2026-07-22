@@ -62,3 +62,24 @@ module "nat_gateway" {
   tags = local.common_tags
 
 }
+
+module "route_tables" {
+
+  source = "./modules/route-tables"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  vpc_id = module.vpc.vpc_id
+
+  internet_gateway_id = module.internet_gateway.igw_id
+
+  nat_gateway_id = module.nat_gateway.nat_gateway_id
+
+  public_subnet_ids = module.subnets.public_subnet_ids
+
+  private_subnet_ids = module.subnets.private_subnet_ids
+
+  tags = local.common_tags
+
+}

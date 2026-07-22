@@ -45,3 +45,15 @@ output "nat_gateway_id" {
 output "nat_gateway_public_ip" {
   value = module.nat_gateway.elastic_ip
 }
+
+output "public_route_table_id" {
+
+  value = module.route_tables.public_route_table_id
+
+}
+
+output "private_route_table_id" {
+
+  value = module.route_tables.private_route_table_id
+
+}
