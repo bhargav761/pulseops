@@ -95,3 +95,14 @@ module "security_groups" {
 
   tags = local.common_tags
 }
+
+module "iam" {
+
+  source = "./modules/iam"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  tags = local.common_tags
+
+}

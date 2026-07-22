@@ -57,3 +57,23 @@ output "private_route_table_id" {
   value = module.route_tables.private_route_table_id
 
 }
+
+output "eks_cluster_security_group_id" {
+  value = module.security_groups.eks_cluster_security_group_id
+}
+
+output "worker_node_security_group_id" {
+  value = module.security_groups.worker_node_security_group_id
+}
+
+output "application_security_group_id" {
+  value = module.security_groups.application_security_group_id
+}
+
+output "eks_cluster_role_arn" {
+  value = module.iam.eks_cluster_role_arn
+}
+
+output "worker_node_role_arn" {
+  value = module.iam.worker_node_role_arn
+}
