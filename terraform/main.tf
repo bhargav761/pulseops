@@ -36,3 +36,16 @@ module "subnets" {
   tags = local.common_tags
 
 }
+
+module "internet_gateway" {
+
+  source = "./modules/internet-gateway"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  vpc_id = module.vpc.vpc_id
+
+  tags = local.common_tags
+
+}

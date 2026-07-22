@@ -33,3 +33,7 @@ output "public_subnet_ids" {
 output "private_subnet_ids" {
   value = module.subnets.private_subnet_ids
 }
+
+output "internet_gateway_id" {
+  value = module.internet_gateway.igw_id
+}
