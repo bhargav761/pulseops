@@ -37,3 +37,11 @@ output "private_subnet_ids" {
 output "internet_gateway_id" {
   value = module.internet_gateway.igw_id
 }
+
+output "nat_gateway_id" {
+  value = module.nat_gateway.nat_gateway_id
+}
+
+output "nat_gateway_public_ip" {
+  value = module.nat_gateway.elastic_ip
+}

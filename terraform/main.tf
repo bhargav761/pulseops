@@ -49,3 +49,16 @@ module "internet_gateway" {
   tags = local.common_tags
 
 }
+
+module "nat_gateway" {
+
+  source = "./modules/nat-gateway"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  public_subnet_id = module.subnets.public_subnet_ids[0]
+
+  tags = local.common_tags
+
+}
