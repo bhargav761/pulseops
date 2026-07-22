@@ -77,3 +77,11 @@ output "eks_cluster_role_arn" {
 output "worker_node_role_arn" {
   value = module.iam.worker_node_role_arn
 }
+
+output "backend_repository_url" {
+  value = module.ecr.backend_repository_url
+}
+
+output "frontend_repository_url" {
+  value = module.ecr.frontend_repository_url
+}
