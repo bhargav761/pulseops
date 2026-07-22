@@ -117,3 +117,26 @@ module "ecr" {
   tags = local.common_tags
 
 }
+
+module "eks" {
+
+  source = "./modules/eks"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  cluster_name = "${var.project_name}-${var.environment}"
+
+  cluster_version = "1.32"
+
+  subnet_ids = module.subnets.private_subnet_ids
+
+  security_group_ids = [
+    module.security_groups.eks_cluster_security_group_id
+  ]
+
+  cluster_role_arn = module.iam.eks_cluster_role_arn
+
+  tags = local.common_tags
+
+}
