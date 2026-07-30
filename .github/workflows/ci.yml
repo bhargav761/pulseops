@@ -20,7 +20,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Python
+      # ------------------------
+      # Python Setup
+      # ------------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -52,7 +54,9 @@ jobs:
           PYTHONPATH: .
         run: pytest
 
-      # Node
+      # ------------------------
+      # Node.js Setup
+      # ------------------------
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -66,7 +70,9 @@ jobs:
         working-directory: frontend/dashboard-ui
         run: npm run build
 
-      # Docker
+      # ------------------------
+      # Docker Build
+      # ------------------------
       - name: Build Backend Docker Image
         run: |
           docker build -t pulseops-backend:latest ./microservices/auth-service
@@ -75,14 +81,18 @@ jobs:
         run: |
           docker build -t pulseops-frontend:latest ./frontend/dashboard-ui
 
-      # Trivy
+      # ------------------------
+      # Trivy Security Scan
+      # ------------------------
       - name: Run Trivy Filesystem Scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
 
-      # Helm
+      # ------------------------
+      # Helm Validation
+      # ------------------------
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
@@ -96,6 +106,8 @@ jobs:
         working-directory: helm/pulseops
         run: helm template pulseops .
 
+      # ------------------------
       # Success
+      # ------------------------
       - name: CI Completed Successfully
         run: echo "🎉 PulseOps CI completed successfully!"
