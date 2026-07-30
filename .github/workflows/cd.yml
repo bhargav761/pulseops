@@ -1,0 +1,54 @@
+name: PulseOps CD
+
+on:
+  workflow_run:
+    workflows: ["PulseOps CI"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./microservices/auth-service
+          push: true
+          tags: |
+            ghcr.io/bhargav761/pulseops-backend:latest
+            ghcr.io/bhargav761/pulseops-backend:${{ github.sha }}
+
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend/dashboard-ui
+          push: true
+          tags: |
+            ghcr.io/bhargav761/pulseops-frontend:latest
+            ghcr.io/bhargav761/pulseops-frontend:${{ github.sha }}
+
+      - name: Deployment Complete
+        run: echo "✅ Images pushed to GitHub Container Registry"
