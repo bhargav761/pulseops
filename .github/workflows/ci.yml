@@ -4,23 +4,6 @@ on:
   push:
     branches:
       - main
-
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-name: PulseOps CI
-
-on:
-  push:
-    branches:
-      - main
-
   pull_request:
     branches:
       - main
@@ -33,15 +16,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -------------------------------
       # Checkout
-      # -------------------------------
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # -------------------------------
-      # Python Setup
-      # -------------------------------
+      # Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -49,208 +28,66 @@ jobs:
           cache: "pip"
           cache-dependency-path: microservices/auth-service/requirements.txt
 
-      # -------------------------------
-      # Install Backend Dependencies
-      # -------------------------------
       - name: Install Backend Dependencies
         working-directory: microservices/auth-service
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # -------------------------------
-      # Ruff Lint
-      # -------------------------------
       - name: Run Ruff Linter
         working-directory: microservices/auth-service
-        run: |
-          ruff check .
+        run: ruff check .
 
-      # -------------------------------
-      # Bandit Security Scan
-      # -------------------------------
       - name: Run Bandit Security Scan
         working-directory: microservices/auth-service
-        run: |
-          bandit -r .
+        run: bandit -r .
 
-      # -------------------------------
-      # Verify Python Syntax
-      # -------------------------------
       - name: Verify Backend Syntax
         working-directory: microservices/auth-service
-        run: |
-          python -m py_compile main.py
+        run: python -m py_compile main.py
 
-      # -------------------------------
-      # Run Unit Tests
-      # -------------------------------
       - name: Run Backend Tests
         working-directory: microservices/auth-service
         env:
           PYTHONPATH: .
-        run: |
-          pytest
+        run: pytest
 
-      # -------------------------------
-      # Node.js Setup
-      # -------------------------------
+      # Node
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: frontend/dashboard-ui/package-lock.json
 
-      # -------------------------------
-      # Install Frontend Dependencies
-      # -------------------------------
       - name: Install Frontend Dependencies
         working-directory: frontend/dashboard-ui
-        run: |
-          npm install
+        run: npm install
 
-      # -------------------------------
-      # Build Frontend
-      # -------------------------------
       - name: Build Frontend
         working-directory: frontend/dashboard-ui
-        run: |
-          npm run build
+        run: npm run build
 
-      # -------------------------------
-      # Build Backend Docker Image
-      # -------------------------------
+      # Docker
       - name: Build Backend Docker Image
         run: |
-          docker build \
-            -t pulseops-backend:latest \
-            ./microservices/auth-service
+          docker build -t pulseops-backend:latest ./microservices/auth-service
 
-      # -------------------------------
-      # Build Frontend Docker Image
-      # -------------------------------
       - name: Build Frontend Docker Image
         run: |
-          docker build \
-            -t pulseops-frontend:latest \
-            ./frontend/dashboard-ui
+          docker build -t pulseops-frontend:latest ./frontend/dashboard-ui
 
-      # -------------------------------
-      # Trivy Filesystem Scan
-      # -------------------------------
+      # Trivy
       - name: Run Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: fs
           scan-ref: .
 
-      # -------------------------------
-      # Install Helm
-      # -------------------------------
+      # Helm
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
           version: v3.15.4
 
-      # -------------------------------
-      # Helm Lint
-      # -------------------------------
-      - name: Helm Lint
-        working-directory: helm/pulseops
-        run: |
-          helm lint .
-
-      # -------------------------------
-      # Helm Template Validation
-      # -------------------------------
-      - name: Helm Template Validation
-        working-directory: helm/pulseops
-        run: |
-          helm template pulseops .
-
-      # -------------------------------
-      # CI Success
-      # -------------------------------
-      - name: CI Completed Successfully
-        run: echo "🎉 PulseOps CI completed successfully!"
-      # Checkout Repository
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      # -------------------------------
-      # Backend
-      # -------------------------------
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Backend Dependencies
-        working-directory: microservices/auth-service
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Verify Backend Syntax
-        working-directory: microservices/auth-service
-        run: |
-          python -m py_compile main.py
-
-      # -------------------------------
-      # Frontend
-      # -------------------------------
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install Frontend Dependencies
-        working-directory: frontend/dashboard-ui
-        run: |
-          npm install
-
-      - name: Build Frontend
-        working-directory: frontend/dashboard-ui
-        run: |
-          npm run build
-
-      # -------------------------------
-      # Docker Images
-      # -------------------------------
-
-      - name: Build Backend Docker Image
-        run: |
-          docker build \
-            -t pulseops-backend:latest \
-            ./microservices/auth-service
-
-      - name: Build Frontend Docker Image
-        run: |
-          docker build \
-            -t pulseops-frontend:latest \
-            ./frontend/dashboard-ui
-
-      # -------------------------------
-      # Success
-      # -------------------------------
-        
-      - name: CI Completed
-        run: echo "🎉 PulseOps CI completed successfully!"
-
-              # -------------------------------
-      # Install Helm
-      # -------------------------------
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.15.4
-
-      # -------------------------------
-      # Helm Validation
-      # -------------------------------
       - name: Helm Lint
         working-directory: helm/pulseops
         run: helm lint .
@@ -258,3 +95,7 @@ jobs:
       - name: Helm Template Validation
         working-directory: helm/pulseops
         run: helm template pulseops .
+
+      # Success
+      - name: CI Completed Successfully
+        run: echo "🎉 PulseOps CI completed successfully!"
