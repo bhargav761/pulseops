@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pulseops-rolebinding
+  namespace: pulseops
+
+subjects:
+- kind: ServiceAccount
+  name: backend-sa
+  namespace: pulseops
+
+- kind: ServiceAccount
+  name: frontend-sa
+  namespace: pulseops
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pulseops-role

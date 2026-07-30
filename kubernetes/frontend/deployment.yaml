@@ -19,18 +19,37 @@ spec:
     spec:
       containers:
         - name: frontend
-
           image: pulseops-frontend:latest
           imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 5173
 
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5173
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5173
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          startupProbe:
+            httpGet:
+              path: /
+              port: 5173
+            failureThreshold: 30
+            periodSeconds: 10
+
           resources:
             requests:
               cpu: "100m"
               memory: "128Mi"
-
             limits:
               cpu: "500m"
               memory: "512Mi"
