@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+
+metadata:
+  name: pulseops-applications
+  namespace: argocd
+
+spec:
+  generators:
+    - list:
+        elements:
+          - name: pulseops
+            namespace: pulseops
+            path: helm/pulseops
+
+  template:
+    metadata:
+      name: "{{name}}"
+
+    spec:
+      project: pulseops
+
+      source:
+        repoURL: https://github.com/bhargav761/pulseops.git
+        targetRevision: main
+        path: "{{path}}"
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
+        syncOptions:
+          - CreateNamespace=true

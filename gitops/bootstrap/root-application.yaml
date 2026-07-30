@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: pulseops
+  name: pulseops-root
   namespace: argocd
 
 spec:
@@ -11,20 +11,13 @@ spec:
   source:
     repoURL: https://github.com/bhargav761/pulseops.git
     targetRevision: main
-    path: helm/pulseops
-
-    helm:
-      valueFiles:
-        - values.yaml
+    path: gitops/applications
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: pulseops
+    namespace: argocd
 
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-
-    syncOptions:
-      - CreateNamespace=true

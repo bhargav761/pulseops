@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+
+metadata:
+  name: pulseops
+  namespace: argocd
+
+spec:
+  description: PulseOps GitOps Project
+
+  sourceRepos:
+    - "https://github.com/bhargav761/pulseops.git"
+
+  destinations:
+    - namespace: pulseops
+      server: https://kubernetes.default.svc
+
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
