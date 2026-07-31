@@ -24,3 +24,4 @@ requests
 pytest==8.4.1
 ruff==0.12.7
 bandit==1.8.6
+httpx==0.28.1
