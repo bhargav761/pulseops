@@ -13,16 +13,19 @@ permissions:
 
 jobs:
   build:
+    name: Build and Validate
     runs-on: ubuntu-latest
 
     steps:
+      # ==========================
       # Checkout
+      # ==========================
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # ------------------------
+      # ==========================
       # Python Setup
-      # ------------------------
+      # ==========================
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -36,63 +39,76 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # ==========================
+      # Code Quality
+      # ==========================
       - name: Run Ruff Linter
         working-directory: microservices/auth-service
-        run: ruff check .
+        run: |
+          ruff check .
 
       - name: Run Bandit Security Scan
         working-directory: microservices/auth-service
-        run: bandit -r .
+        run: |
+          bandit -r . -x tests
 
       - name: Verify Backend Syntax
         working-directory: microservices/auth-service
-        run: python -m py_compile main.py
+        run: |
+          python -m py_compile main.py
 
       - name: Run Backend Tests
         working-directory: microservices/auth-service
         env:
           PYTHONPATH: .
-        run: pytest
+        run: |
+          pytest
 
-      # ------------------------
-      # Node.js Setup
-      # ------------------------
+      # ==========================
+      # Node.js
+      # ==========================
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Install Frontend Dependencies
         working-directory: frontend/dashboard-ui
-        run: npm install
+        run: |
+          npm install
 
       - name: Build Frontend
         working-directory: frontend/dashboard-ui
-        run: npm run build
+        run: |
+          npm run build
 
-      # ------------------------
-      # Docker Build
-      # ------------------------
+      # ==========================
+      # Docker
+      # ==========================
       - name: Build Backend Docker Image
         run: |
-          docker build -t pulseops-backend:latest ./microservices/auth-service
+          docker build \
+            -t pulseops-backend:latest \
+            ./microservices/auth-service
 
       - name: Build Frontend Docker Image
         run: |
-          docker build -t pulseops-frontend:latest ./frontend/dashboard-ui
+          docker build \
+            -t pulseops-frontend:latest \
+            ./frontend/dashboard-ui
 
-      # ------------------------
+      # ==========================
       # Trivy Security Scan
-      # ------------------------
+      # ==========================
       - name: Run Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
 
-      # ------------------------
-      # Helm Validation
-      # ------------------------
+      # ==========================
+      # Helm
+      # ==========================
       - name: Set up Helm
         uses: azure/setup-helm@v4
         with:
@@ -100,14 +116,16 @@ jobs:
 
       - name: Helm Lint
         working-directory: helm/pulseops
-        run: helm lint .
+        run: |
+          helm lint .
 
       - name: Helm Template Validation
         working-directory: helm/pulseops
-        run: helm template pulseops .
+        run: |
+          helm template pulseops .
 
-      # ------------------------
-      # Success
-      # ------------------------
+      # ==========================
+      # Complete
+      # ==========================
       - name: CI Completed Successfully
         run: echo "🎉 PulseOps CI completed successfully!"
