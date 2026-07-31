@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: prometheus-rules
+  namespace: monitoring
+
+data:
+  alerts.yml: |
+    groups:
+      - name: pulseops-alerts
+        rules:
+          - alert: BackendDown
+            expr: up{job="backend"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Backend is down"
+              description: "PulseOps backend has been unreachable for more than 1 minute."
+
+          - alert: HighCPUUsage
+            expr: 100 - (avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High CPU Usage"
+              description: "CPU usage is above 80%."
+
+          - alert: HighMemoryUsage
+            expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High Memory Usage"
+              description: "Memory usage is above 80%."

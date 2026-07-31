@@ -18,26 +18,25 @@ spec:
         app: prometheus
 
     spec:
-
       containers:
+        - name: prometheus
+          image: prom/prometheus:latest
 
-      - name: prometheus
+          ports:
+            - containerPort: 9090
 
-        image: prom/prometheus:latest
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus/
 
-        ports:
-        - containerPort: 9090
-
-        volumeMounts:
-
-        - name: prometheus-config
-
-          mountPath: /etc/prometheus/
+            - name: prometheus-rules
+              mountPath: /etc/prometheus/rules
 
       volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
 
-      - name: prometheus-config
-
-        configMap:
-
-          name: prometheus-config
+        - name: prometheus-rules
+          configMap:
+            name: prometheus-rules
