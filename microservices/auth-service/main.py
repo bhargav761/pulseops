@@ -1,15 +1,15 @@
+import os
+from datetime import datetime
+
+import requests
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
-from datetime import datetime
-import os
-import requests
-
 from prometheus_client import (
+    CONTENT_TYPE_LATEST,
     Counter,
     Gauge,
     generate_latest,
-    CONTENT_TYPE_LATEST,
 )
 
 # ----------------------------------------------------
