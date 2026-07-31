@@ -1,0 +1,28 @@
+name: Trivy Image Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Backend Image
+        run: docker build -t pulseops-backend ./microservices/auth-service
+
+      - name: Scan Backend Image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: pulseops-backend
+          format: table
+          exit-code: 0
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH

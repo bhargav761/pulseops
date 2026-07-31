@@ -1,0 +1,31 @@
+name: Generate SBOM
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  sbom:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Backend Image
+        run: docker build -t pulseops-backend ./microservices/auth-service
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          image: pulseops-backend
+          format: cyclonedx-json
+          output-file: sbom.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulseops-sbom
+          path: sbom.json
