@@ -50,7 +50,7 @@ jobs:
       - name: Run Bandit Security Scan
         working-directory: microservices/auth-service
         run: |
-          bandit -r . -x tests
+          bandit -r . -s B101
 
       - name: Verify Backend Syntax
         working-directory: microservices/auth-service
