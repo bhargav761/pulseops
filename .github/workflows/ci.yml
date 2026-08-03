@@ -13,9 +13,9 @@ permissions:
 
 jobs:
 
-  # ==========================================================
-  # Backend + Frontend + Helm
-  # ==========================================================
+  ###########################################################
+  # Backend + Frontend + Helm Validation
+  ###########################################################
 
   build:
     name: Build and Validate
@@ -26,9 +26,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # --------------------------
+      #######################################################
       # Python
-      # --------------------------
+      #######################################################
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -42,32 +42,29 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install ruff bandit pytest
 
-      - name: Ruff
+      - name: Run Ruff
         working-directory: microservices/auth-service
-        run: |
-          ruff check .
+        run: ruff check .
 
-      - name: Bandit
+      - name: Run Bandit
         working-directory: microservices/auth-service
-        run: |
-          bandit -r . -s B101
+        run: bandit -r . -s B101
 
       - name: Verify Backend Syntax
         working-directory: microservices/auth-service
-        run: |
-          python -m py_compile main.py
+        run: python -m py_compile main.py
 
       - name: Run Backend Tests
         working-directory: microservices/auth-service
         env:
           PYTHONPATH: .
-        run: |
-          pytest -v
+        run: pytest -v
 
-      # --------------------------
-      # Node
-      # --------------------------
+      #######################################################
+      # Frontend
+      #######################################################
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -82,9 +79,9 @@ jobs:
         working-directory: frontend/dashboard-ui
         run: npm run build
 
-      # --------------------------
+      #######################################################
       # Docker
-      # --------------------------
+      #######################################################
 
       - name: Build Backend Docker Image
         run: |
@@ -98,19 +95,19 @@ jobs:
             -t pulseops-frontend:latest \
             ./frontend/dashboard-ui
 
-      # --------------------------
-      # Security
-      # --------------------------
+      #######################################################
+      # Security Scan
+      #######################################################
 
-      - name: Trivy Filesystem Scan
+      - name: Run Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
 
-      # --------------------------
-      # Helm
-      # --------------------------
+      #######################################################
+      # Helm Validation
+      #######################################################
 
       - name: Setup Helm
         uses: azure/setup-helm@v4
@@ -119,20 +116,18 @@ jobs:
 
       - name: Helm Lint
         working-directory: helm/pulseops
-        run: |
-          helm lint .
+        run: helm lint .
 
       - name: Helm Template Validation
         working-directory: helm/pulseops
-        run: |
-          helm template pulseops .
+        run: helm template pulseops .
 
-      - name: Build Completed
-        run: echo "Backend + Frontend Validation Completed"
+      - name: Build Validation Completed
+        run: echo "✅ Backend + Frontend + Helm validation completed."
 
-  # ==========================================================
-  # AI Incident Analyzer
-  # ==========================================================
+  ###########################################################
+  # AI Incident Analyzer Validation
+  ###########################################################
 
   aiops:
     name: AI Incident Analyzer
@@ -152,6 +147,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      #######################################################
+      # Python
+      #######################################################
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -159,30 +158,42 @@ jobs:
           cache: pip
           cache-dependency-path: aiops/incident-analyzer/requirements.txt
 
-      - name: Install Dependencies
+      - name: Install AI Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install ruff bandit pytest
+
+      #######################################################
+      # Code Quality
+      #######################################################
 
       - name: Verify Python Syntax
-        run: |
-          python -m py_compile main.py
+        run: python -m py_compile main.py
 
-      - name: Ruff
-        run: |
-          ruff check .
+      - name: Run Ruff
+        run: ruff check .
 
-      - name: Bandit
-        run: |
-          bandit -r . -s B101
+      - name: Run Bandit
+        run: bandit -r . -s B101
+
+      #######################################################
+      # Testing
+      #######################################################
 
       - name: Run Unit Tests
-        run: |
-          pytest -v
+        run: pytest -v
 
-      - name: Build Docker Image
-        run: |
-          docker build -t pulseops-ai:latest .
+      #######################################################
+      # Docker
+      #######################################################
+
+      - name: Build AI Docker Image
+        run: docker build -t pulseops-ai:latest .
+
+      #######################################################
+      # Completed
+      #######################################################
 
       - name: AI Incident Analyzer Validation Completed
-        run: echo "AI Incident Analyzer Passed"
+        run: echo "✅ AI Incident Analyzer validation completed successfully."
