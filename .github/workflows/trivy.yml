@@ -6,23 +6,28 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   trivy:
+    name: Trivy Filesystem Scan
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Build Backend Image
-        run: docker build -t pulseops-backend ./microservices/auth-service
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t pulseops-backend:latest ./microservices/auth-service
 
-      - name: Scan Backend Image
-        uses: aquasecurity/trivy-action@0.28.0
+      - name: Run Trivy Scan
+        uses: aquasecurity/trivy-action@master
         with:
-          image-ref: pulseops-backend
+          image-ref: pulseops-backend:latest
           format: table
-          exit-code: 0
+          exit-code: "0"
           ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
+          vuln-type: "os,library"
+          severity: "CRITICAL,HIGH"
