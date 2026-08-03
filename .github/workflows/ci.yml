@@ -12,25 +12,29 @@ permissions:
   contents: read
 
 jobs:
+
+  # ==========================================================
+  # Backend + Frontend + Helm
+  # ==========================================================
+
   build:
     name: Build and Validate
     runs-on: ubuntu-latest
 
     steps:
-      # ==========================
-      # Checkout
-      # ==========================
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # ==========================
-      # Python Setup
-      # ==========================
+      # --------------------------
+      # Python
+      # --------------------------
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
+          cache: pip
           cache-dependency-path: microservices/auth-service/requirements.txt
 
       - name: Install Backend Dependencies
@@ -39,15 +43,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ==========================
-      # Code Quality
-      # ==========================
-      - name: Run Ruff Linter
+      - name: Ruff
         working-directory: microservices/auth-service
         run: |
           ruff check .
 
-      - name: Run Bandit Security Scan
+      - name: Bandit
         working-directory: microservices/auth-service
         run: |
           bandit -r . -s B101
@@ -62,11 +63,12 @@ jobs:
         env:
           PYTHONPATH: .
         run: |
-          pytest
+          pytest -v
 
-      # ==========================
-      # Node.js
-      # ==========================
+      # --------------------------
+      # Node
+      # --------------------------
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -74,17 +76,16 @@ jobs:
 
       - name: Install Frontend Dependencies
         working-directory: frontend/dashboard-ui
-        run: |
-          npm install
+        run: npm install
 
       - name: Build Frontend
         working-directory: frontend/dashboard-ui
-        run: |
-          npm run build
+        run: npm run build
 
-      # ==========================
+      # --------------------------
       # Docker
-      # ==========================
+      # --------------------------
+
       - name: Build Backend Docker Image
         run: |
           docker build \
@@ -97,19 +98,21 @@ jobs:
             -t pulseops-frontend:latest \
             ./frontend/dashboard-ui
 
-      # ==========================
-      # Trivy Security Scan
-      # ==========================
-      - name: Run Trivy Filesystem Scan
+      # --------------------------
+      # Security
+      # --------------------------
+
+      - name: Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
 
-      # ==========================
+      # --------------------------
       # Helm
-      # ==========================
-      - name: Set up Helm
+      # --------------------------
+
+      - name: Setup Helm
         uses: azure/setup-helm@v4
         with:
           version: v3.15.4
@@ -124,8 +127,62 @@ jobs:
         run: |
           helm template pulseops .
 
-      # ==========================
-      # Complete
-      # ==========================
-      - name: CI Completed Successfully
-        run: echo "🎉 PulseOps CI completed successfully!"
+      - name: Build Completed
+        run: echo "Backend + Frontend Validation Completed"
+
+  # ==========================================================
+  # AI Incident Analyzer
+  # ==========================================================
+
+  aiops:
+    name: AI Incident Analyzer
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: aiops/incident-analyzer
+
+    env:
+      GEMINI_API_KEY: dummy-key
+      PROMETHEUS_URL: http://localhost:9090
+      LOKI_URL: http://localhost:3100
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: aiops/incident-analyzer/requirements.txt
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify Python Syntax
+        run: |
+          python -m py_compile main.py
+
+      - name: Ruff
+        run: |
+          ruff check .
+
+      - name: Bandit
+        run: |
+          bandit -r . -s B101
+
+      - name: Run Unit Tests
+        run: |
+          pytest -v
+
+      - name: Build Docker Image
+        run: |
+          docker build -t pulseops-ai:latest .
+
+      - name: AI Incident Analyzer Validation Completed
+        run: echo "AI Incident Analyzer Passed"

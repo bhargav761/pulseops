@@ -1,31 +1,116 @@
-venv/
+# ==================================================
+# PulseOps - .gitignore
+# ==================================================
+
+# --------------------------------------------------
+# Python
+# --------------------------------------------------
 __pycache__/
-*.pyc
-node_modules/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Environment Variables
 .env
+.env.*
+
+# SQLite Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# --------------------------------------------------
+# Node.js
+# --------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build Output
 dist/
 build/
+.next/
+coverage/
+
+# --------------------------------------------------
 # Terraform
+# --------------------------------------------------
 **/.terraform/
 *.tfstate
 *.tfstate.*
 crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 *.tfvars
-!terraform/terraform.tfvars.example
 
-# Terraform lock file (keep it)
+# Keep example and lock file
+!terraform/terraform.tfvars.example
 !.terraform.lock.hcl
 
-# IDE
+# --------------------------------------------------
+# Docker
+# --------------------------------------------------
+.docker/
+docker-data/
+
+# --------------------------------------------------
+# Kubernetes
+# --------------------------------------------------
+*.kubeconfig
+
+# --------------------------------------------------
+# Logs
+# --------------------------------------------------
+*.log
+logs/
+*.out
+
+# --------------------------------------------------
+# IDE / Editors
+# --------------------------------------------------
 .vscode/
 .idea/
+.history/
 
-# Node
-node_modules/
+# --------------------------------------------------
+# Operating System
+# --------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Python
-__pycache__/
-*.pyc
+# --------------------------------------------------
+# Temporary Files
+# --------------------------------------------------
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
 
-# Logs
-*.log
+# --------------------------------------------------
+# Reports
+# --------------------------------------------------
+reports/*.html
+reports/*.xml
+
+# --------------------------------------------------
+# Miscellaneous
+# --------------------------------------------------
+.cache/
