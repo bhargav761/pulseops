@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ .Release.Name }}-ai
+  namespace: {{ .Release.Namespace }}
+
+  labels:
+    app: pulseops-ai
+
+spec:
+  replicas: {{ .Values.aiops.replicaCount }}
+
+  revisionHistoryLimit: 5
+
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: pulseops-ai
+
+  template:
+
+    metadata:
+      labels:
+        app: pulseops-ai
+
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8001"
+
+    spec:
+
+      containers:
+
+        - name: pulseops-ai
+
+          image: "{{ .Values.aiops.image.repository }}:{{ .Values.aiops.image.tag }}"
+
+          imagePullPolicy: {{ .Values.aiops.image.pullPolicy }}
+
+          ports:
+
+            - containerPort: 8001
+
+          envFrom:
+
+            - configMapRef:
+                name: {{ .Release.Name }}-ai-config
+
+            - secretRef:
+                name: {{ .Release.Name }}-ai-secret
+
+          resources:
+
+            requests:
+              cpu: {{ .Values.aiops.resources.requests.cpu }}
+              memory: {{ .Values.aiops.resources.requests.memory }}
+
+            limits:
+              cpu: {{ .Values.aiops.resources.limits.cpu }}
+              memory: {{ .Values.aiops.resources.limits.memory }}
+
+          readinessProbe:
+
+            httpGet:
+              path: /health
+              port: 8001
+
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+
+            httpGet:
+              path: /health
+              port: 8001
+
+            initialDelaySeconds: 20
+            periodSeconds: 15

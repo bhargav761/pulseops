@@ -47,3 +47,39 @@ config:
   prometheusUrl: "http://prometheus:9090/api/v1/query"
 secret:
   apiKey: "pulseops-secret-key"  
+
+
+aiops:
+
+  replicaCount: 2
+
+  image:
+    repository: pulseops-ai
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  config:
+    prometheusUrl: http://prometheus.monitoring.svc.cluster.local:9090
+    lokiUrl: http://loki.monitoring.svc.cluster.local:3100
+    databasePath: /app/pulseops.db
+    logLevel: INFO
+    aiModel: gemini-2.5-flash
+
+  secret:
+    geminiApiKey: replace-with-your-api-key
+    geminiModel: gemini-2.5-flash
+    appEnv: production
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  hpa:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: pulseops-ai-config
+  namespace: pulseops
+
+data:
+  PROMETHEUS_URL: "http://prometheus.monitoring.svc.cluster.local:9090"
+
+  LOKI_URL: "http://loki.monitoring.svc.cluster.local:3100"
+
+  DATABASE_PATH: "/app/pulseops.db"
+
+  LOG_LEVEL: "INFO"
+
+  AI_MODEL: "gemini-2.5-flash"

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: pulseops-ai
+  namespace: pulseops
+
+  labels:
+    app: pulseops-ai
+
+spec:
+  replicas: 2
+
+  revisionHistoryLimit: 5
+
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app: pulseops-ai
+
+  template:
+
+    metadata:
+      labels:
+        app: pulseops-ai
+
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8001"
+
+    spec:
+
+      containers:
+
+        - name: pulseops-ai
+
+          image: pulseops-ai:latest
+
+          imagePullPolicy: IfNotPresent
+
+          ports:
+
+            - containerPort: 8001
+
+          envFrom:
+
+            - configMapRef:
+                name: pulseops-ai-config
+
+            - secretRef:
+                name: pulseops-ai-secret
+
+          resources:
+
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          livenessProbe:
+
+            httpGet:
+              path: /health
+              port: 8001
+
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+
+          readinessProbe:
+
+            httpGet:
+              path: /health
+              port: 8001
+
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5

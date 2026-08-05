@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ .Release.Name }}-ai-config
+  namespace: {{ .Release.Namespace }}
+
+data:
+  PROMETHEUS_URL: {{ .Values.aiops.config.prometheusUrl | quote }}
+  LOKI_URL: {{ .Values.aiops.config.lokiUrl | quote }}
+  DATABASE_PATH: {{ .Values.aiops.config.databasePath | quote }}
+  LOG_LEVEL: {{ .Values.aiops.config.logLevel | quote }}
+  AI_MODEL: {{ .Values.aiops.config.aiModel | quote }}
