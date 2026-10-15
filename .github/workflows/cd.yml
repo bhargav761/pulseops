@@ -33,7 +33,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Backend Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./microservices/auth-service
           push: true
@@ -42,7 +42,7 @@ jobs:
             ghcr.io/bhargav761/pulseops-backend:${{ github.sha }}
 
       - name: Build and Push Frontend Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend/dashboard-ui
           push: true
